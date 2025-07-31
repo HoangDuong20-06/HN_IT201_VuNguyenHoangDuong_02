@@ -11,6 +11,26 @@ typedef struct TreeNode {
     struct TreeNode *left;
     struct TreeNode *right;
 }TreeNode;
+TreeNode *root = NULL;
+TreeNode* createNode(char *name, char *phone, char *email) {
+    TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
+    strcpy(newNode->data.name, name);
+    strcpy(newNode->data.phone, phone);
+    strcpy(newNode->data.email, email);
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+void insert(TreeNode **root, TreeNode *newNode) {
+    if (*root == NULL) {
+        *root = newNode;
+        return;
+    }
+    if (strcmp(newNode->data.name, (*root)->data.name) < 0) {
+        insert(&((*root)->left), newNode);
+    } else {
+        insert(&((*root)->right), newNode);
+    }
+}
 void addContact() {
     char name[100],phone[100],email[100];
     printf("Nhap ten: ");
@@ -22,15 +42,24 @@ void addContact() {
     printf("Nhap email: ");
     fgets(email,100,stdin);
     email[strcspn(email,"\n")]=0;
-    TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
-    strcpy(newNode->data.name,name);
-    strcpy(newNode->data.phone,phone);
-    strcpy(newNode->data.email,email);
-    newNode->left=NULL;
-    newNode->right=NULL;
+    TreeNode *newNode = createNode(name, phone, email);
+    insert(&root, newNode);
+    printf("Them thanh cong\n");
+}
+void displayByInorder(TreeNode *node) {
+    if (node == NULL) return;
+    displayByInorder(node->left);
+    printf("Tên: %s\nSĐT: %s\nEmail: %s\n\n",
+           node->data.name, node->data.phone, node->data.email);
+    displayByInorder(node->right);
 }
 void displayContacs() {
-
+    printf("Danh sach danh ba\n");
+    if (root == NULL) {
+        printf("Danh ba rong\n");
+        return;
+    }
+    displayByInorder(root);
 }
 void searchContact() {
 
@@ -49,6 +78,7 @@ int main() {
         printf("5.Thoat\n");
         printf("Nhap lua chon cua ban: ");
         scanf("%d",&choice);
+        getchar();
         switch (choice) {
             case 1:
                 addContact();

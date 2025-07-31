@@ -1,46 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 typedef struct {
     char chuoi[100];
+}clipEnter;
+typedef struct {
+    clipEnter data[100];
     int top;
 }clipBoardStack;
 typedef struct {
-    clipBoardStack data;
+    clipEnter data[100];
     int top;
 }redoStack;
-clipBoardStack *createClipBoard() {
-    clipBoardStack *stack = (clipBoardStack *)malloc(sizeof(clipBoardStack));
-    stack->top = 0;
-    return stack;
-}
-redoStack *createRedo() {
-    redoStack *stack = (redoStack *)malloc(sizeof(redoStack));
-    stack->top = 0;
-    return stack;
-}
+
+clipBoardStack clipBoard;
+redoStack reDo;
 void copy() {
-    clipBoardStack *stack = createClipBoard();
+    clipBoard.top=0;
+    if (clipBoard.top >= 100) {
+        printf("Clipboard full!\n");
+        return;
+    }
     char chuoi[100];
     printf("Nhap mot chuoi: ");
-    fgets(chuoi,100,stdin);
-    chuoi[strcspn(chuoi,"\n")]=0;
-    strcspn(chuoi,"\r");
-    stack->top = stack->top+1;
+    fgets(chuoi, sizeof(chuoi), stdin);
+    chuoi[strcspn(chuoi, "\n")] = '\0';
+    strcpy(clipBoard.data[clipBoard.top].chuoi, chuoi);
+    clipBoard.top++;
     printf("Them thanh cong\n");
 }
 void paste() {
-
+    if (clipBoard.top == 0) {
+        printf("Clipboard is empty!\n");
+        return;
+    }
+    printf("Paste: %s\n", clipBoard.data[clipBoard.top - 1].chuoi);
 }
 void undo() {
-
+    if (clipBoard.top == 0) {
+        printf("Nothing to undo!\n");
+        return;
+    }
+    reDo.data[reDo.top++]=clipBoard.data[--clipBoard.top];
+    printf("Undo complete\n");
 }
 void redo() {
-
+    if (reDo.top == 0) {
+        printf("Nothing to redo!\n");
+        return;
+    }
+    clipBoard.data[clipBoard.top++]=reDo.data[--reDo.top];
+    printf("redo complete\n");
 }
 void printAll() {
-
+    printf("ALL CLIPBOARD\n");
+    if (clipBoard.top == 0) {
+        printf("Empty\n");
+    }else {
+        for (int i = 0;i<clipBoard.top;i++) {
+            printf("%d. %s\n", i + 1, clipBoard.data[i].chuoi);
+        }
+    }
 }
 int main() {
     int choice;
